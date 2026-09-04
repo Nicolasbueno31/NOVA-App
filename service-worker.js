@@ -1,4 +1,4 @@
-const CACHE_NAME = 'nova-catalogo-v1.1.0';
+const CACHE_NAME = 'nova-catalogo-v1.1.1';
 const FILES_TO_CACHE = [
   './',
   './index.html',
@@ -9,7 +9,6 @@ const FILES_TO_CACHE = [
 
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(FILES_TO_CACHE)));
-  // Activa esta versión sin dejar a los teléfonos atrapados en una caché anterior.
   self.skipWaiting();
 });
 
@@ -35,13 +34,11 @@ self.addEventListener('fetch', event => {
   const request = event.request;
   const url = new URL(request.url);
 
-  // version.json siempre debe venir de Internet para poder detectar una versión nueva.
   if (url.pathname.endsWith('/version.json')) {
     event.respondWith(fetch(request, { cache: 'no-store' }));
     return;
   }
 
-  // Para páginas HTML: red primero; si no hay conexión, usa la copia offline.
   if (request.mode === 'navigate') {
     event.respondWith(
       fetch(request)
@@ -50,12 +47,11 @@ self.addEventListener('fetch', event => {
           caches.open(CACHE_NAME).then(cache => cache.put('./index.html', copy));
           return response;
         })
-        .catch(() => caches.match(request).then(r => r || caches.match('./index.html')))
+        .catch(() => caches.match('./index.html'))
     );
     return;
   }
 
-  // Recursos estáticos: caché primero, con respaldo de red.
   event.respondWith(
     caches.match(request).then(cached => cached || fetch(request).then(response => {
       if (response && response.ok && url.origin === self.location.origin) {
