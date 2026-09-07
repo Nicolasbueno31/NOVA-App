@@ -1,5 +1,5 @@
 # NOVA-App
 
-Versión 1.1.3 · 04/09/2026
+Versión 1.1.4 · 07/09/2026
 
-Biblioteca Técnica NOVA con logo NOVA HERRAMIENTAS corregido y actualización automática PWA.
+Biblioteca Técnica NOVA actualizada. Esta versión incorpora el nuevo catálogo y mantiene el logo NOVA HERRAMIENTAS y la actualización automática PWA.
