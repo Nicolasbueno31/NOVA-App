@@ -4,6 +4,24 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Biblioteca Técnica NOVA</title>
+
+<link rel="manifest" href="manifest.webmanifest">
+<script>
+const NOVA_APP_VERSION = "1.1.5";
+const NOVA_APP_DATE = "07/09/2026";
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", async () => {
+    try {
+      const reg = await navigator.serviceWorker.register("service-worker.js");
+      await reg.update();
+    } catch (e) {
+      console.warn("NOVA: no se pudo registrar el service worker", e);
+    }
+  });
+}
+</script>
+
 <!-- Referencia: catálogo NOVA actualizado - nuevas herramientas agosto 2026 -->
 <meta name="theme-color" content="#c8102e">
 <meta name="mobile-web-app-capable" content="yes">
@@ -243,4 +261,98 @@ function toggleAppHint(){
 window.addEventListener('load',()=>{try{render();}catch(e){console.error('NOVA render error',e); const g=document.getElementById('grid'); if(g) g.innerHTML='<div class="empty">Error al cargar catálogo. Revisar archivo.</div>';}});
 </script>
 <div style="position:fixed;bottom:6px;right:10px;font-size:10px;color:#888;z-index:9999;">Creado por N. Bueno</div>
+
+<style>
+#novaUpdateBanner{position:fixed;left:12px;right:12px;bottom:18px;z-index:10050;max-width:620px;margin:auto;background:#171717;color:#fff;border-radius:18px;padding:15px 16px;box-shadow:0 14px 36px rgba(0,0,0,.32);display:none;align-items:center;gap:12px;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+#novaUpdateBanner.show{display:flex}
+#novaUpdateBanner .novaUpdateText{flex:1;min-width:0}
+#novaUpdateBanner strong{display:block;font-size:14px;margin-bottom:3px}
+#novaUpdateBanner span{display:block;font-size:12px;line-height:1.35;color:#ddd}
+#novaUpdateBanner button{border:0;border-radius:12px;background:#c8102e;color:#fff;padding:11px 13px;font-weight:800;white-space:nowrap;cursor:pointer}
+#novaVersion{position:fixed;bottom:6px;left:10px;font-size:10px;color:#888;z-index:9999;background:rgba(246,247,249,.82);padding:2px 5px;border-radius:6px}
+@media(max-width:520px){#novaUpdateBanner{align-items:stretch;flex-direction:column}#novaUpdateBanner button{width:100%}}
+</style>
+
+<div id="novaUpdateBanner" role="status" aria-live="polite">
+  <div class="novaUpdateText">
+    <strong>Nueva versión disponible</strong>
+    <span id="novaUpdateMessage">Hay una actualización de NOVA pronta para instalar.</span>
+  </div>
+  <button id="novaUpdateButton" type="button">Actualizar ahora</button>
+</div>
+<div id="novaVersion">Versión 1.1.5 · 07/09/2026</div>
+
+<script>
+(function(){
+  let latestVersion = NOVA_APP_VERSION;
+
+  function newer(remote, local){
+    const a=String(remote).split('.').map(n=>parseInt(n,10)||0);
+    const b=String(local).split('.').map(n=>parseInt(n,10)||0);
+    for(let i=0;i<Math.max(a.length,b.length);i++){
+      const x=a[i]||0, y=b[i]||0;
+      if(x>y) return true;
+      if(x<y) return false;
+    }
+    return false;
+  }
+
+  async function checkNovaUpdate(){
+    if(!navigator.onLine) return;
+    try{
+      const r=await fetch('./version.json?t='+Date.now(), {cache:'no-store'});
+      if(!r.ok) return;
+      const info=await r.json();
+
+      // Si el HTML actual ya es igual o más nuevo, nunca mostrar el aviso.
+      if(!info.version || !newer(info.version, NOVA_APP_VERSION)){
+        document.getElementById('novaUpdateBanner')?.classList.remove('show');
+        localStorage.setItem('nova-installed-version', NOVA_APP_VERSION);
+        return;
+      }
+
+      // Evita repetir el mismo aviso si el usuario ya lo aplicó y el navegador aún no terminó de refrescar.
+      const applied = localStorage.getItem('nova-applied-update');
+      if(applied === info.version) return;
+
+      latestVersion=info.version;
+      document.getElementById('novaUpdateMessage').textContent =
+        (info.message || 'Se actualizaron contenidos de NOVA.') +
+        ' Versión ' + info.version + (info.date ? ' · ' + info.date : '');
+      document.getElementById('novaUpdateBanner').classList.add('show');
+    }catch(e){}
+  }
+
+  async function applyNovaUpdate(){
+    const btn=document.getElementById('novaUpdateButton');
+    if(btn){ btn.disabled=true; btn.textContent='Actualizando…'; }
+    localStorage.setItem('nova-applied-update', latestVersion);
+
+    try{
+      if('serviceWorker' in navigator){
+        const reg=await navigator.serviceWorker.getRegistration();
+        if(reg) await reg.update();
+        if(navigator.serviceWorker.controller){
+          navigator.serviceWorker.controller.postMessage({type:'CLEAR_NOVA_CACHE'});
+        }
+      }
+      if('caches' in window){
+        const keys=await caches.keys();
+        await Promise.all(keys.map(k=>caches.delete(k)));
+      }
+    }catch(e){}
+
+    const u=new URL(location.href);
+    u.searchParams.set('v', latestVersion);
+    location.replace(u.toString());
+  }
+
+  document.getElementById('novaUpdateButton')?.addEventListener('click', applyNovaUpdate);
+  window.addEventListener('load',()=>setTimeout(checkNovaUpdate,1200));
+  window.addEventListener('online',checkNovaUpdate);
+  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible') checkNovaUpdate();});
+  setInterval(checkNovaUpdate,30*60*1000);
+})();
+</script>
+
 </body></html>

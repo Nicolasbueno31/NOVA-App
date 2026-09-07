@@ -1,5 +1,5 @@
 {
-  "version": "1.1.4",
+  "version": "1.1.5",
   "date": "07/09/2026",
-  "message": "Se actualizó el catálogo NOVA con el nuevo contenido y se renovó la caché PWA."
+  "message": "Corrección del aviso de actualización para que no vuelva a aparecer después de instalar la versión."
 }
