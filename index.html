@@ -7,8 +7,8 @@
 
 <link rel="manifest" href="manifest.webmanifest">
 <script>
-const NOVA_APP_VERSION = "1.1.5";
-const NOVA_APP_DATE = "07/09/2026";
+const NOVA_APP_VERSION = "1.1.6";
+const NOVA_APP_DATE = "08/09/2026";
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
@@ -164,7 +164,42 @@ body.homeCollapsed .meta{padding-top:5px}
 @media print{.homeCollapseBtn{display:none!important}}
 
 </style>
-</head><body><div class="app">
+
+<style id="nova-login-style">
+#novaLogin{position:fixed;inset:0;z-index:999999;background:linear-gradient(135deg,#f7f7f8 0%,#eceef1 100%);display:flex;align-items:center;justify-content:center;padding:22px;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+#novaLogin.hidden{display:none}
+.novaLoginCard{width:min(420px,100%);background:#fff;border-radius:22px;box-shadow:0 24px 70px rgba(0,0,0,.18);padding:34px 30px;border:1px solid #e5e7eb}
+.novaLoginMark{width:72px;height:72px;margin:0 auto 16px;border-radius:18px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 12px 28px rgba(200,16,46,.20);overflow:hidden;border:1px solid #e5e7eb}
+.novaLoginMark img{width:100%;height:100%;display:block;object-fit:cover}
+.novaLoginCard h1{font-size:24px;margin:0;text-align:center;color:#171717}
+.novaLoginCard .sub{margin:7px 0 24px;text-align:center;color:#6b7280;font-size:14px}
+.novaField{margin:14px 0}
+.novaField label{display:block;font-size:12px;font-weight:800;color:#374151;margin:0 0 7px;text-transform:uppercase;letter-spacing:.04em}
+.novaField input{width:100%;border:1px solid #d1d5db;border-radius:12px;padding:13px 14px;font-size:15px;outline:none;background:#fff;color:#111}
+.novaField input:focus{border-color:#c8102e;box-shadow:0 0 0 3px rgba(200,16,46,.10)}
+#novaLoginBtn{width:100%;border:0;border-radius:12px;padding:14px 16px;background:#c8102e;color:#fff;font-weight:800;font-size:15px;cursor:pointer;margin-top:8px}
+#novaLoginBtn:hover{filter:brightness(.96)}
+#novaLoginMsg{min-height:20px;margin:12px 0 0;text-align:center;font-size:13px;font-weight:700;color:#b42318}
+.novaLoginFoot{margin-top:18px;text-align:center;font-size:11px;color:#9ca3af}
+#novaLogout{position:fixed;right:14px;bottom:14px;z-index:99990;border:0;border-radius:999px;padding:9px 13px;background:#27272a;color:#fff;font:700 12px Inter,system-ui,sans-serif;box-shadow:0 6px 20px rgba(0,0,0,.18);cursor:pointer;display:none}
+body.novaLocked>.app{visibility:hidden}
+@media(max-width:640px){.novaLoginCard{padding:28px 22px;border-radius:18px}.novaLoginMark{width:64px;height:64px}}
+@media print{#novaLogin,#novaLogout{display:none!important}}
+</style>
+</head><body class="novaLocked"><div id="novaLogin" role="dialog" aria-modal="true" aria-labelledby="novaLoginTitle">
+  <div class="novaLoginCard">
+    <div class="novaLoginMark"><img src="icon-192.png" alt="Logo app NOVA herramientas"></div>
+    <h1 id="novaLoginTitle">Biblioteca Técnica NOVA</h1>
+    <div class="sub">Acceso al catálogo de herramientas</div>
+    <form id="novaLoginForm" autocomplete="off">
+      <div class="novaField"><label for="novaUser">Usuario</label><input id="novaUser" type="text" autocomplete="username" spellcheck="false"></div>
+      <div class="novaField"><label for="novaPass">Contraseña</label><input id="novaPass" type="password" autocomplete="current-password"></div>
+      <button id="novaLoginBtn" type="submit">Ingresar</button>
+      <div id="novaLoginMsg" aria-live="polite"></div>
+    </form>
+    <div class="novaLoginFoot">NOVA Construcciones</div>
+  </div>
+</div><button id="novaLogout" type="button">Cerrar sesión</button><div class="app">
 <header class="header"><div class="appBrand"><img class="appLogo" src="icon-192.png" alt="NOVA"><div class="appBrandText"><div class="kicker">NOVA Construcciones</div><h1>Biblioteca Técnica NOVA</h1></div><button id="installBtn" class="installBtn hidden" onclick="installNovaApp()">Instalar app</button></div><button id="homeCollapseBtn" class="homeCollapseBtn" onclick="toggleHomePanel()" title="Reducir inicio" aria-label="Reducir pantalla de inicio">⌃</button><div class="searchRow"><input id="q" class="search" placeholder="Buscar código, descripción, insumo..." autocomplete="off"><button class="iconBtn" onclick="doSearch()" title="Buscar" aria-label="Buscar">🔍</button><button class="clear" onclick="clearSearch()">Limpiar</button><button class="pdfBtn" onclick="printCatalog()">PDF / Imprimir A4</button></div><div class="stats"><div class="stat"><b id="statItems">49</b><span id="statLabel">herramientas</span></div><div class="stat"><b id="statComplete">190</b><span>unidades</span></div><div class="stat"><b id="statPending">3</b><span>kits oficiales</span></div></div><div class="offlineBar"><span id="offlineDot" class="offlineDot"></span><span id="offlineText">Modo offline activo: catálogo autocontenido</span><button id="offlineToggle" class="offlineToggle" onclick="toggleAppHint()" title="Ocultar ayuda" aria-label="Ocultar o mostrar ayuda">⌃</button></div><div id="appHint" class="appHint">Para usarlo como app: abrilo en Chrome, tocá los tres puntos y elegí <b>Agregar a pantalla principal</b>. Si aparece el botón “Instalar app”, también podés usarlo.</div></header>
 <nav class="toolbar" id="moduleChips" style="top:147px"><button class="chip active" data-module="herramienta">📚 Herramientas</button><button class="chip" data-module="encofrado">🏗️ Encofrados</button></nav><nav class="toolbar" id="chips" style="top:200px"><button class="chip active" data-filter="all">Todas</button><button class="chip" data-filter="inicio">Kit Inicio</button><button class="chip" data-filter="hormigon">Kit Hormigón</button><button class="chip" data-filter="albanileria">Kit Albañilería</button><button class="chip" data-filter="consumibles">Con insumos</button></nav>
 <div class="installTip"><b>Modo offline:</b> este archivo queda autocontenido. Guardalo en el celular o abrilo una vez; las fotos y fichas no dependen de internet.</div><div class="meta" id="count"></div><main class="grid" id="grid"></main>
@@ -280,7 +315,7 @@ window.addEventListener('load',()=>{try{render();}catch(e){console.error('NOVA r
   </div>
   <button id="novaUpdateButton" type="button">Actualizar ahora</button>
 </div>
-<div id="novaVersion">Versión 1.1.5 · 07/09/2026</div>
+<div id="novaVersion">Versión 1.1.6 · 08/09/2026</div>
 
 <script>
 (function(){
@@ -355,4 +390,17 @@ window.addEventListener('load',()=>{try{render();}catch(e){console.error('NOVA r
 })();
 </script>
 
+
+<script id="nova-login-script">
+(function(){
+ const U='26e575eeb2eedffde50009f9414cb622b93c8415e82451e19287e18290bb01a6', P='055f4e0d81f16ce93d8551976f177dc01fa7956d98a909c150bf23519f1b1b40', KEY='nova_catalog_auth_v1';
+ const login=document.getElementById('novaLogin'), form=document.getElementById('novaLoginForm'), msg=document.getElementById('novaLoginMsg'), logout=document.getElementById('novaLogout');
+ async function sha(v){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(v));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('')}
+ function openCatalog(){document.body.classList.remove('novaLocked');login.classList.add('hidden');logout.style.display='block';}
+ function lockCatalog(){sessionStorage.removeItem(KEY);document.body.classList.add('novaLocked');login.classList.remove('hidden');logout.style.display='none';document.getElementById('novaPass').value='';document.getElementById('novaUser').focus();}
+ if(sessionStorage.getItem(KEY)==='1') openCatalog(); else setTimeout(()=>document.getElementById('novaUser').focus(),50);
+ form.addEventListener('submit',async function(e){e.preventDefault();msg.textContent='';const u=document.getElementById('novaUser').value.trim();const p=document.getElementById('novaPass').value;try{if(await sha(u)===U && await sha(p)===P){sessionStorage.setItem(KEY,'1');openCatalog();}else{msg.textContent='Usuario o contraseña incorrectos.';document.getElementById('novaPass').select();}}catch(err){msg.textContent='No se pudo validar el acceso en este navegador.';}});
+ logout.addEventListener('click',lockCatalog);
+})();
+</script>
 </body></html>

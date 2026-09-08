@@ -1,5 +1,5 @@
 # NOVA-App
 
-Versión 1.1.5 · 07/09/2026
+Versión 1.1.6 · 08/09/2026
 
-Biblioteca Técnica NOVA actualizada. Se corrige el sistema de actualización para evitar que el aviso vuelva a aparecer luego de instalar la versión vigente.
+Biblioteca Técnica NOVA actualizada con pantalla de acceso mediante usuario y contraseña. Mantiene funcionamiento offline, sistema de actualización e instalación como app.
