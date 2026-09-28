@@ -1,5 +1,5 @@
 {
-  "version": "1.1.11",
-  "date": "25/09/2026",
-  "message": "Se agrega aviso automático cada 10 segundos con desvanecido suave y duración máxima de 3 segundos."
+  "version": "1.1.13",
+  "date": "28/09/2026",
+  "message": "Se corrige el logo de la pantalla de ingreso usando el mismo logo integrado de la app."
 }
